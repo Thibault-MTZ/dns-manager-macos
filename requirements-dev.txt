@@ -1,0 +1,3 @@
+# Optional terminal QA; these are not runtime dependencies.
+pyte>=0.8,<0.9
+Pillow>=10,<13

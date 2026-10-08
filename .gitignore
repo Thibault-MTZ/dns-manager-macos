@@ -1,0 +1,14 @@
+.build/
+dist/
+.DS_Store
+.swiftpm/
+.venv/
+__pycache__/
+*.pyc
+*.log
+*.bak
+.env
+.env.*
+!.env.example
+settings.json
+restore.json
