@@ -1,6 +1,6 @@
 # DNS Manager pour macOS
 
-![Bêta](https://img.shields.io/badge/version-0.1.0--beta.1-f59e0b)
+![Bêta](https://img.shields.io/badge/version-0.1.0--beta.2-f59e0b)
 ![macOS](https://img.shields.io/badge/macOS-13%2B-111827?logo=apple)
 ![Swift](https://img.shields.io/badge/Swift-5.9%2B-F05138?logo=swift)
 
@@ -28,7 +28,7 @@ DNS Manager rassemble les connexions réseau, les résolveurs et les tests DNS d
 | Maintenance | Cache, service, installation et mise à jour des outils |
 | Restauration | Sauvegarde avant changement et retour arrière |
 
-Les résolveurs prédéfinis sont publics : Cloudflare, Quad9 et Quad9 sans filtrage. Les DNS locaux et les fournisseurs personnalisés se configurent dans l'app ; aucun réseau privé n'est imposé par défaut.
+Les résolveurs prédéfinis sont publics : Cloudflare, Quad9 et Quad9 sans filtrage. Les DNS locaux et les fournisseurs personnalisés se configurent dans l'app ; aucun réseau privé n'est imposé par défaut. Pour un nom HTTPS privé, le champ facultatif **IP du serveur HTTPS** évite une dépendance au DNS du proxy lui-même ; le certificat reste vérifié avec le nom HTTPS.
 
 ## Dépendances
 
@@ -101,7 +101,7 @@ L'autorisation durable est **facultative et expérimentale dans cette bêta**. L
 
 Compilation, TUI, voyant, contrôles DNS et navigation vérifiés sur un Mac Apple Silicon. Vérifications du moteur et tests de terminal inclus.
 
-- Le composant administrateur compile ; son cycle complet d'installation, activation, restauration et retrait reste à valider sur une machine de test.
+- Installation, état, cache et activation du composant administrateur vérifiés sans nouvelle demande de mot de passe. Restauration et retrait restent à valider sur une machine de test.
 - La détection VPN dépend des informations exposées par macOS. Profils, clés et routes ne sont pas modifiés.
 - DoT, DoQ et DNS direct sont des cibles de **test** ; l'activation utilise DoH ou DNSCrypt.
 - Le voyant indique la résolution, pas le chiffrement de toutes les applications.

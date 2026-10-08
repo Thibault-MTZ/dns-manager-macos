@@ -84,7 +84,13 @@ final class TUI {
         let name = input("Nom", default: existing?.name ?? "")
         let endpoint = input("Adresse de test (IP, https://, tls://, quic:// ou sdns://)", default: existing?.endpoint ?? "")
         let enteredStamp = input("Stamp sdns:// (automatique pour HTTPS ; facultatif ; '-' pour effacer)", default: existing?.stamp ?? "")
-        let resolver = Resolver(id: id, name: name, endpoint: endpoint, stamp: enteredStamp == "-" ? "" : enteredStamp)
+        let serverIP = input("IP du serveur HTTPS (facultatif)", default: existing?.stampAddress ?? "")
+        var stamp = enteredStamp == "-" ? "" : enteredStamp
+        if !serverIP.isEmpty {
+            guard let generated = Resolver.dohStamp(endpoint, address: serverIP) else { throw ManagerError.message("URL HTTPS et IP valide requises.") }
+            stamp = generated
+        }
+        let resolver = Resolver(id: id, name: name, endpoint: endpoint, stamp: stamp)
         try resolver.validate()
         guard !settings.resolvers.contains(where: { $0.id == id && $0.id != existing?.id }) else { throw ManagerError.message("Cet identifiant existe déjà.") }
         if let existing, let index = settings.resolvers.firstIndex(where: { $0.id == existing.id }) { settings.resolvers[index] = resolver }

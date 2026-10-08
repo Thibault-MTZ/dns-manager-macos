@@ -63,7 +63,12 @@ trap rollback EXIT
 /usr/bin/install -m 755 -o root -g wheel "$STAGE_DIR/helper" "$HELPER.new"
 /bin/mv -f "$HELPER.new" "$HELPER"
 /usr/bin/install -m 600 -o root -g wheel "$STAGE_DIR/installation.json" "$ADMIN_DIR/installation.json"
-if [ ! -f "$CONFIG" ]; then /usr/bin/install -m 644 -o root -g wheel "$INSTALL_PREFIX/etc/dnscrypt-proxy.toml" "$CONFIG"; fi
+ACTIVE_CONFIG="$INSTALL_PREFIX/etc/dnscrypt-proxy.toml"
+if [ -f "$SERVICE" ]; then
+    ACTIVE_CONFIG="$(/usr/bin/plutil -extract ProgramArguments.2 raw -o - "$SERVICE")"
+fi
+case "$ACTIVE_CONFIG" in "$INSTALL_PREFIX/etc/dnscrypt-proxy.toml"|"$CONFIG") ;; *) echo 'Configuration active inattendue.' >&2; exit 1 ;; esac
+if [ "$ACTIVE_CONFIG" != "$CONFIG" ]; then /usr/bin/install -m 644 -o root -g wheel "$ACTIVE_CONFIG" "$CONFIG"; fi
 /usr/bin/install -m 755 -o root -g wheel "$INSTALL_PREFIX/sbin/dnscrypt-proxy" "$PROXY.new"
 /bin/mv -f "$PROXY.new" "$PROXY"
 "$PROXY" -config "$CONFIG" -check
@@ -83,9 +88,14 @@ PLIST
 /usr/bin/install -m 644 -o root -g wheel "$ADMIN_DIR/new-service.plist" "$SERVICE"
 /bin/launchctl bootstrap system "$SERVICE"
 /bin/sleep 1
-/bin/launchctl print system/sh.brew.dnscrypt-proxy | /usr/bin/grep -q 'state = running'
+# A grep -q pipeline can close early and make launchctl return SIGPIPE (141)
+# under pipefail, falsely rolling back an otherwise successful installation.
+/bin/launchctl print system/sh.brew.dnscrypt-proxy > "$ADMIN_DIR/service-status.txt"
+/usr/bin/grep -q 'state = running' "$ADMIN_DIR/service-status.txt"
 /usr/bin/install -m 440 -o root -g wheel "$STAGE_DIR/sudoers" "$RULE"
-/usr/sbin/visudo -c
+# Validate only this app's rule. Pre-existing unrelated rules may have their
+# own permission errors; they must not make this installation roll back.
+/usr/sbin/visudo -cf "$RULE"
 trap - EXIT
 INSTALL
 chmod 700 "$STAGE_DIR/install.sh"

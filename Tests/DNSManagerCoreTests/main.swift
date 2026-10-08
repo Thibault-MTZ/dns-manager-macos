@@ -169,6 +169,18 @@ final class CoreTests {
         XCTAssertTrue(demo.checks.allSatisfy { $0.detail.contains("203.0.113.80") })
         XCTAssertTrue(demo.systemDNS.contains("fictives"))
     }
+    func testPinnedDoHAddressPreservesTLSHostname() {
+        let stamp = Resolver.dohStamp("https://dns.example.com/dns-query", address: "192.0.2.53")!
+        let resolver = Resolver(id: "custom", name: "Custom", endpoint: "https://dns.example.com/dns-query", stamp: stamp)
+        XCTAssertTrue(resolver.canActivate)
+        XCTAssertEqual(resolver.stampAddress, "192.0.2.53")
+        var encoded = String(stamp.dropFirst(7)).replacingOccurrences(of: "-", with: "+").replacingOccurrences(of: "_", with: "/")
+        encoded += String(repeating: "=", count: (4 - encoded.count % 4) % 4)
+        XCTAssertTrue(Data(base64Encoded: encoded)!.range(of: Data("dns.example.com".utf8)) != nil)
+        let ipv6 = Resolver.dohStamp("https://dns.example.com/dns-query", address: "2001:db8::53")!
+        XCTAssertEqual(Resolver(id: "v6", name: "V6", endpoint: "https://dns.example.com/dns-query", stamp: ipv6).stampAddress, "2001:db8::53")
+        XCTAssertTrue(Resolver.dohStamp("https://dns.example.com/dns-query", address: "not-an-ip") == nil)
+    }
 }
 
 do {
@@ -190,6 +202,7 @@ do {
     try suite.testGenericDefaultsAndLegacySettingsMigration()
     try suite.testReleaseVersionConsistency()
     suite.testDemoUsesDocumentedFixtures()
+    suite.testPinnedDoHAddressPreservesTLSHostname()
 } catch { failures += 1; print("ÉCHEC : \(error)") }
-print(failures == 0 ? "✓ 17 scénarios de vérification réussis." : "✗ \(failures) échec(s).")
+print(failures == 0 ? "✓ 18 scénarios de vérification réussis." : "✗ \(failures) échec(s).")
 exit(failures == 0 ? 0 : 1)

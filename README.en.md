@@ -1,6 +1,6 @@
 # DNS Manager for macOS
 
-![Beta](https://img.shields.io/badge/version-0.1.0--beta.1-f59e0b)
+![Beta](https://img.shields.io/badge/version-0.1.0--beta.2-f59e0b)
 ![macOS](https://img.shields.io/badge/macOS-13%2B-111827?logo=apple)
 ![Swift](https://img.shields.io/badge/Swift-5.9%2B-F05138?logo=swift)
 
@@ -28,7 +28,7 @@ DNS Manager brings network connections, resolvers and DNS checks into a three-pa
 | Maintenance | Cache, service and tool installation / updates |
 | Recovery | Save settings before changes and restore previous state |
 
-Only public resolvers are preset: Cloudflare, Quad9 and Quad9 without threat blocking. Local DNS and custom providers are configured by the user. No private network is included by default.
+Only public resolvers are preset: Cloudflare, Quad9 and Quad9 without threat blocking. Local DNS and custom providers are configured by the user. No private network is included by default. The optional **HTTPS server IP** field avoids bootstrap loops for private names while preserving hostname-based certificate verification.
 
 ## Dependencies
 
@@ -101,7 +101,7 @@ Persistent authorization is **optional and experimental in this beta**. The root
 
 The build, TUI, menu bar app, DNS checks and navigation have been verified on an Apple Silicon Mac. Core checks and PTY tests are included.
 
-- The administrator component builds; its complete installation, activation, recovery and removal cycle still needs integration validation on a test machine.
+- Administrator installation, status, cache flush and activation have been verified without repeated password prompts. Recovery and removal still need integration validation on a test machine.
 - VPN detection depends on macOS-exposed data. VPN profiles, keys and routes are not changed.
 - Plain DNS, DoT and DoQ are for **testing**; proxy activation uses DoH or DNSCrypt.
 - The indicator reports resolution health, not encryption across every application.

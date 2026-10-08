@@ -10,6 +10,6 @@ A native macOS app to inspect and manage DNS from a full-screen terminal UI, wit
 
 **Name:** DNS Manager for macOS
 
-**Version:** 0.1.0-beta.1
+**Version:** 0.1.0-beta.2
 
 **Topics:** macos, dns, tui, swift, dnscrypt-proxy, doggo, ghostty

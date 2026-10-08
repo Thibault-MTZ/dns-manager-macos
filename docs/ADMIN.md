@@ -1,6 +1,6 @@
 # Autorisation système facultative
 
-**Expérimental : le cycle complet d'installation, activation, restauration et retrait reste à valider sur une machine de test.**
+**Bêta : installation, état, cache et activation vérifiés. Restauration et retrait restent à valider sur une machine de test.**
 
 ```bash
 bash scripts/build.sh
@@ -40,4 +40,4 @@ Une confirmation est demandée. La règle et le composant administrateur sont re
 
 ## English
 
-This optional beta helper grants the installing account access to defined DNS actions. Requests are structured, paths are fixed, and arbitrary commands are rejected. Installation protects the proxy/configuration and restarts the existing service without changing interface DNS. Updates require an authorized reinstall. Removal revokes the helper access while preserving DNS state. Full privileged lifecycle testing remains pending.
+This optional beta helper grants the installing account access to defined DNS actions. Requests are structured, paths are fixed, and arbitrary commands are rejected. Installation protects the proxy/configuration and restarts the existing service without changing interface DNS. Updates require an authorized reinstall. Removal revokes the helper access while preserving DNS state. Installation, status, cache flush and activation have been verified. Recovery and removal remain pending.

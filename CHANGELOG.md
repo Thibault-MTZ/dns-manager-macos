@@ -1,5 +1,16 @@
 # Historique / Changelog
 
+## 0.1.0-beta.2 — 2026-10-08
+
+- Correction de la vérification du service : suppression du faux échec SIGPIPE sous `pipefail`.
+- Validation de la seule règle sudo de l'app ; une erreur dans une règle extérieure ne provoque plus de retour arrière.
+- Conservation de la configuration effectivement active lors de l'installation.
+- IP du serveur HTTPS facultative pour éviter une boucle DNS avec un nom privé ; validation TLS conservée.
+- Installation, état, deux vidages de cache et activation testés sans demande répétée de mot de passe. Restauration et retrait restent à vérifier.
+- 18 scénarios du moteur et contrôles du TUI.
+
+Installer fixes and optional HTTPS server IP support. Persistent DNS authorization, cache operations and activation verified; recovery and removal remain pending.
+
 ## 0.1.0-beta.1 — 2026-10-08
 
 Première bêta générique de DNS Manager pour macOS.

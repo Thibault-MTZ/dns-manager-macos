@@ -255,7 +255,7 @@ final class Dashboard {
     private func editResolver(_ existing: Resolver? = nil) {
         if demo { banner = "Démonstration en lecture seule : aucune modification."; return }
         guard !busy else { return }
-        let values = [("Identifiant", existing?.id ?? ""), ("Nom", existing?.name ?? ""), ("Adresse (IP, https://, tls://, quic:// ou sdns://)", existing?.endpoint ?? ""), ("Stamp facultatif — automatique pour HTTPS", existing?.stamp ?? "")]
+        let values = [("Identifiant", existing?.id ?? ""), ("Nom", existing?.name ?? ""), ("Adresse (IP, https://, tls://, quic:// ou sdns://)", existing?.endpoint ?? ""), ("Stamp facultatif — automatique pour HTTPS", existing?.stamp ?? ""), ("IP du serveur HTTPS (facultatif, pour éviter une boucle DNS)", existing?.stampAddress ?? "")]
         form = Form(title: existing == nil ? "Ajouter un résolveur" : "Modifier le résolveur", fields: values.map { Field(label: $0.0, value: $0.1, cursor: $0.1.count) }, kind: .resolver(existing?.id))
     }
     private func submitForm(_ value: Form) {
@@ -263,7 +263,12 @@ final class Dashboard {
             let fields = value.fields.map(\.value)
             switch value.kind {
             case .resolver(let existingID):
-                let resolver = Resolver(id: fields[0], name: fields[1], endpoint: fields[2], stamp: fields[3])
+                var stamp = fields[3]
+                if !fields[4].isEmpty {
+                    guard let generated = Resolver.dohStamp(fields[2], address: fields[4]) else { throw ManagerError.message("Une URL HTTPS et une adresse IP valide sont requises pour ce champ.") }
+                    stamp = generated
+                }
+                let resolver = Resolver(id: fields[0], name: fields[1], endpoint: fields[2], stamp: stamp)
                 var next = settings
                 if let existingID, let i = next.resolvers.firstIndex(where: { $0.id == existingID }) { next.resolvers[i] = resolver }
                 else { next.resolvers.append(resolver) }

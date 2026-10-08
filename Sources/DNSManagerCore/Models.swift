@@ -30,20 +30,31 @@ public struct Resolver: Codable, Identifiable, Equatable {
     }
     // DoH stamps use the standard DNS stamp format with unknown properties,
     // no pinned certificate hashes, and normal HTTPS certificate verification.
-    public static func dohStamp(_ endpoint: String) -> String? {
+    public static func dohStamp(_ endpoint: String, address: String = "") -> String? {
+        guard address.isEmpty || Validation.ip(address) else { return nil }
         guard let url = URLComponents(string: endpoint), url.scheme == "https",
               let host = url.host, !host.isEmpty, url.user == nil, url.password == nil,
               url.fragment == nil else { return nil }
         let hostname = host + (url.port.map { ":\($0)" } ?? "")
         let path = (url.percentEncodedPath.isEmpty ? "/dns-query" : url.percentEncodedPath) + (url.percentEncodedQuery.map { "?\($0)" } ?? "")
         let hostBytes = Data(hostname.utf8), pathBytes = Data(path.utf8)
-        guard hostBytes.count <= 255, pathBytes.count <= 255 else { return nil }
+        let addressBytes = Data((address.contains(":") ? "[\(address)]" : address).utf8)
+        guard hostBytes.count <= 255, pathBytes.count <= 255, addressBytes.count <= 255 else { return nil }
         var data = Data([2] + Array(repeating: UInt8(0), count: 8))
-        data.append(0) // Empty server address: resolved by bootstrap resolvers.
+        data.append(UInt8(addressBytes.count)); data.append(addressBytes)
         data.append(0) // Empty certificate hash list.
         data.append(UInt8(hostBytes.count)); data.append(hostBytes)
         data.append(UInt8(pathBytes.count)); data.append(pathBytes)
         return "sdns://" + data.base64EncodedString().replacingOccurrences(of: "+", with: "-").replacingOccurrences(of: "/", with: "_").replacingOccurrences(of: "=", with: "")
+    }
+    public var stampAddress: String {
+        guard Self.stampProtocol(stamp) == 2 else { return "" }
+        var base64 = String(stamp.dropFirst(7)).replacingOccurrences(of: "-", with: "+").replacingOccurrences(of: "_", with: "/")
+        base64 += String(repeating: "=", count: (4 - base64.count % 4) % 4)
+        guard let bytes = Data(base64Encoded: base64), bytes.count > 9 else { return "" }
+        let length = Int(bytes[9])
+        guard bytes.count >= 10 + length else { return "" }
+        return String(decoding: bytes[10..<(10 + length)], as: UTF8.self).trimmingCharacters(in: CharacterSet(charactersIn: "[]"))
     }
     public var activationStamp: String { stamp.isEmpty ? Self.dohStamp(endpoint) ?? "" : stamp }
     public var canActivate: Bool { [UInt8(1), UInt8(2)].contains(Self.stampProtocol(activationStamp) ?? 255) }

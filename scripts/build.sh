@@ -38,6 +38,7 @@ cat > "$APP_DIR/Contents/Info.plist" <<'PLIST'
 </dict></plist>
 PLIST
 /usr/libexec/PlistBuddy -c "Set :CFBundleShortVersionString $BUNDLE_VERSION" "$APP_DIR/Contents/Info.plist"
+/usr/libexec/PlistBuddy -c "Set :CFBundleVersion ${RELEASE_VERSION##*.}" "$APP_DIR/Contents/Info.plist"
 cat > "$PROJECT_DIR/dist/Lancer TUI.command" <<'LAUNCH'
 #!/bin/bash
 cd "$(dirname "$0")"

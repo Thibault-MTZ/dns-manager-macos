@@ -161,12 +161,12 @@ with tempfile.TemporaryDirectory(prefix="dns-manager-tui-qa-") as temporary:
 
         terminal.send("a")
         assert "Ajouter un résolveur" in terminal.text
-        terminal.send("qa-temp" + TAB + "Résolveur QA" + TAB + "https://cloudflare-dns.com/dns-query" + TAB + ENTER)
+        terminal.send("qa-temp" + TAB + "Résolveur QA" + TAB + "https://cloudflare-dns.com/dns-query" + TAB + TAB + ENTER)
         saved = json.loads((directory / "settings.json").read_text())
         assert any(r["id"] == "qa-temp" and r["name"] == "Résolveur QA" for r in saved["resolvers"])
         terminal.send("e")
         assert "Modifier le résolveur" in terminal.text
-        terminal.send(TAB + "\x15" + "QA corrigé" + TAB + TAB + ENTER)
+        terminal.send(TAB + "\x15" + "QA corrigé" + TAB + TAB + TAB + ENTER)
         saved = json.loads((directory / "settings.json").read_text())
         assert any(r["id"] == "qa-temp" and r["name"] == "QA corrigé" for r in saved["resolvers"])
         terminal.send("d" + ENTER)
